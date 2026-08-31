@@ -65,8 +65,15 @@ require_cmd() {
 }
 
 uninstall_release() {
-  local name="$1" ns_args=("${@:2}")
-  if helm uninstall "$name" "${ns_args[@]}" --kube-context "$KUBE_CONTEXT" 2>/dev/null; then
+  # $1: release name, $2: namespace (optional -- omit for the default namespace).
+  # Written without arrays: macOS ships bash 3.2 by default, where `set -u`
+  # treats expanding an empty array as an unbound-variable error.
+  local name="$1" ns="${2:-}"
+  local ns_flag=""
+  [[ -n "$ns" ]] && ns_flag="-n $ns"
+  # shellcheck disable=SC2086 # ns_flag is intentionally unquoted: it's either
+  # empty or exactly "-n <name>", never contains spaces of its own.
+  if helm uninstall "$name" $ns_flag --kube-context "$KUBE_CONTEXT" 2>/dev/null; then
     ok "$name release removed"
   else
     info "$name release not installed"
@@ -77,8 +84,8 @@ uninstall_release() {
 if [[ "$MODE" == "down" || "$MODE" == "destroy" ]]; then
   step "Tearing down app and observability stack"
   uninstall_release devops-demo
-  uninstall_release kube-prometheus-stack -n "$NAMESPACE_MONITORING"
-  uninstall_release loki -n "$NAMESPACE_MONITORING"
+  uninstall_release kube-prometheus-stack "$NAMESPACE_MONITORING"
+  uninstall_release loki "$NAMESPACE_MONITORING"
   kubectl --context "$KUBE_CONTEXT" delete -f observability/devops-demo-alerts.yaml --ignore-not-found 2>/dev/null || true
   kubectl --context "$KUBE_CONTEXT" delete configmap devops-demo-dashboard -n "$NAMESPACE_MONITORING" --ignore-not-found 2>/dev/null || true
 
