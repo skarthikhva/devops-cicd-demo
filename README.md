@@ -4,6 +4,20 @@ A small Spring Boot web app used as the subject of an end-to-end DevOps / CI-CD 
 build → test → static analysis → container scan → registry push → deploy to a local
 Kubernetes cluster → observe with Prometheus/Grafana.
 
+## Quick start
+
+Bring up the whole thing -- build, containerize, local `kind` cluster, app, and the full
+Prometheus/Grafana/Loki/Alertmanager stack -- with one command:
+
+```bash
+./scripts/run-pipeline.sh
+```
+
+Requires Docker Desktop running plus `kind`, `kubectl`, and `helm` on your PATH; the script
+checks for all of them and tells you what's missing. It's idempotent, so re-run it any time
+you change code, a chart, or a values file. `./scripts/run-pipeline.sh --help` covers the
+`--no-tests`, `--down`, and `--destroy` flags.
+
 ## App
 
 A single-page feedback form (name + message) backed by an in-memory store. Built with:
@@ -48,6 +62,7 @@ This repo is being built up stage by stage as part of a CI/CD workshop:
 - [x] Prometheus + Grafana + Alertmanager + Loki observability stack -- see
       [observability/README.md](observability/README.md)
 - [x] Branch protection on `main`
+- [x] One-command local bootstrap -- [scripts/run-pipeline.sh](scripts/run-pipeline.sh)
 
 ## Contributing
 
