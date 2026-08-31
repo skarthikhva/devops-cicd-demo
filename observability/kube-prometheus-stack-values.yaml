@@ -1,0 +1,39 @@
+# Values for prometheus-community/kube-prometheus-stack, tuned for a local kind cluster.
+# Install with:
+#   helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+#     --namespace monitoring -f observability/kube-prometheus-stack-values.yaml
+
+grafana:
+  adminPassword: admin
+  # Loki's own Helm chart (grafana/loki-stack) provisions a Grafana datasource ConfigMap
+  # labeled `grafana_datasource: "1"`, which this chart's sidecar auto-discovers (see
+  # sidecar.datasources below) -- no need to declare it again here.
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+    datasources:
+      searchNamespace: ALL
+
+prometheus:
+  prometheusSpec:
+    # Discover ServiceMonitor/PodMonitor/PrometheusRule objects cluster-wide, not just
+    # ones carrying a `release: kube-prometheus-stack` label -- simpler for a workshop
+    # cluster where we don't want to hand-label every resource.
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    retention: 6h
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
