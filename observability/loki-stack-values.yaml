@@ -1,0 +1,24 @@
+# Values for grafana/loki-stack (Loki + Promtail), paired with kube-prometheus-stack-values.yaml.
+# Install with:
+#   helm install loki grafana/loki-stack --namespace monitoring \
+#     -f observability/loki-stack-values.yaml
+
+grafana:
+  enabled: false # Grafana comes from kube-prometheus-stack instead
+
+promtail:
+  enabled: true
+
+loki:
+  persistence:
+    enabled: false # fine for a local/demo cluster; logs don't survive a Loki pod restart
+  # This chart's own Grafana datasource ConfigMap defaults to isDefault:true, which collides
+  # with kube-prometheus-stack's default Prometheus datasource and crash-loops Grafana
+  # ("Only one datasource per organization can be marked as default").
+  isDefault: false
+  # Pin the UID so dashboards (see observability/devops-demo-dashboard.json) can reference this
+  # datasource by a stable id instead of an Grafana-generated one. Must be set before Grafana's
+  # first boot -- Grafana's file-based datasource provisioner does not update an existing
+  # datasource's uid on a later reload, only on initial creation.
+  datasource:
+    uid: loki

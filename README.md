@@ -35,14 +35,15 @@ docker build -t devops-demo:local .
 docker run -p 8080:8080 devops-demo:local
 ```
 
-## Pipeline (in progress)
+## Pipeline
 
 This repo is being built up stage by stage as part of a CI/CD workshop:
 
 - [x] Spring Boot app + tests
 - [x] Actuator + Micrometer + custom Prometheus metrics
 - [x] Dockerfile
-- [ ] GitHub Actions CI (build, test, SonarCloud, Trivy, push to GHCR)
-- [ ] Helm chart
-- [ ] Deploy to a local `kind` cluster
-- [ ] Prometheus + Grafana + Alertmanager + Loki observability stack
+- [x] GitHub Actions CI (build, test, SonarCloud, Trivy, push to GHCR)
+- [x] Helm chart
+- [x] Deploy to a local `kind` cluster
+- [x] Prometheus + Grafana + Alertmanager + Loki observability stack -- see
+      [observability/README.md](observability/README.md)

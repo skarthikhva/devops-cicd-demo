@@ -2,6 +2,8 @@ package com.workshop.devopsdemo;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -11,6 +13,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class SubmissionService {
+
+    private static final Logger log = LoggerFactory.getLogger(SubmissionService.class);
 
     private final List<Submission> submissions = new CopyOnWriteArrayList<>();
     private final AtomicLong sequence = new AtomicLong();
@@ -27,6 +31,7 @@ public class SubmissionService {
         Submission submission = new Submission(sequence.incrementAndGet(), name, message, Instant.now());
         submissions.add(submission);
         submissionCounter.increment();
+        log.info("Submission #{} received from '{}'", submission.id(), name);
         return submission;
     }
 
