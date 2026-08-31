@@ -31,6 +31,16 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template.
   name: ""
 
+# Plain (non-secret) environment variables, and/or secret material sourced from a Kubernetes
+# Secret or ConfigMap via envFrom -- the runtime secrets story. The value itself never lives
+# here, in this chart, or in git: only the *name* of a Secret you created separately, e.g.
+#   kubectl create secret generic devops-demo-secrets --from-literal=DEMO_API_KEY=...
+# See observability/README.md or scripts/run-pipeline.sh for how the demo wires this.
+env: []
+envFrom: []
+  # - secretRef:
+  #     name: devops-demo-secrets
+
 # This is for setting Kubernetes Annotations to a Pod.
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 podAnnotations: {}

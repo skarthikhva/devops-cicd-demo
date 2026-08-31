@@ -7,8 +7,10 @@
 # already runs automatically in GitHub Actions on every push -- see
 # .github/workflows/ci.yml. This script reproduces everything downstream of
 # that, locally: build the jar, build the image, stand up (or reuse) a kind
-# cluster, deploy the app, deploy Prometheus/Grafana/Loki/Alertmanager, wire
-# the dashboard and alert rules, and print how to reach all of it. It's
+# cluster, deploy the app (wired to a runtime secret, demonstrating the
+# in-cluster half of secrets management), deploy Prometheus/Grafana/Loki/
+# Alertmanager, wire the dashboard and alert rules, and print how to reach
+# all of it. It's
 # idempotent -- safe to re-run any time you change code, a chart, or a
 # values file.
 #
@@ -181,6 +183,16 @@ helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheu
   --wait --timeout 8m
 ok "prometheus stack ready"
 
+# ---------- app secret ----------
+# The runtime half of secrets management: a Kubernetes Secret created directly in the
+# cluster (never committed to git, never in a Helm values file). Only its *name* is
+# passed to Helm below; the value stays in the cluster's Secret store.
+step "Provisioning the app's runtime secret"
+kubectl --context "$KUBE_CONTEXT" create secret generic devops-demo-secrets \
+  --from-literal=DEMO_API_KEY=demo-value-not-a-real-secret \
+  --dry-run=client -o yaml | kubectl --context "$KUBE_CONTEXT" apply -f - >/dev/null
+ok "devops-demo-secrets applied"
+
 # ---------- app ----------
 step "Installing/upgrading the app"
 helm upgrade --install devops-demo helm/devops-demo \
@@ -188,6 +200,7 @@ helm upgrade --install devops-demo helm/devops-demo \
   --set image.tag="$IMAGE_TAG" \
   --set image.pullPolicy=IfNotPresent \
   --set serviceMonitor.enabled=true \
+  --set "envFrom[0].secretRef.name=devops-demo-secrets" \
   --kube-context "$KUBE_CONTEXT"
 
 # The image tag string never changes between local rebuilds, so Kubernetes
