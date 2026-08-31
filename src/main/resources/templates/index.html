@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DevOps Demo</title>
+    <style>
+        body { font-family: -apple-system, Arial, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
+        h1 { font-size: 1.4rem; }
+        form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+        input, textarea { padding: 8px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px; font-size: 1rem; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .error { color: #dc2626; font-size: 0.85rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .empty { color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>DevOps CI/CD Demo &mdash; Feedback Form</h1>
+
+    <form th:action="@{/submissions}" th:object="${submissionForm}" method="post">
+        <label for="name">Name</label>
+        <input type="text" id="name" th:field="*{name}" placeholder="Your name"/>
+        <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+
+        <label for="message">Message</label>
+        <textarea id="message" th:field="*{message}" rows="3" placeholder="Say something"></textarea>
+        <span class="error" th:if="${#fields.hasErrors('message')}" th:errors="*{message}"></span>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Submissions</h2>
+    <p class="empty" th:if="${submissions.isEmpty()}">No submissions yet.</p>
+    <table th:unless="${submissions.isEmpty()}">
+        <thead>
+            <tr><th>#</th><th>Name</th><th>Message</th><th>Submitted</th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="s : ${submissions}">
+                <td th:text="${s.id()}"></td>
+                <td th:text="${s.name()}"></td>
+                <td th:text="${s.message()}"></td>
+                <td th:text="${s.submittedAt()}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
