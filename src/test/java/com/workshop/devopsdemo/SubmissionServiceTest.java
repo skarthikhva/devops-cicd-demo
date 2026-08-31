@@ -1,9 +1,12 @@
 package com.workshop.devopsdemo;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,5 +46,22 @@ class SubmissionServiceTest {
 
         double count = meterRegistry.get("app_submissions_total").counter().count();
         assertThat(count).isEqualTo(2.0);
+    }
+
+    @Test
+    void addStripsNewlinesFromLoggedNameToPreventLogInjection() {
+        var logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(SubmissionService.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+
+        try {
+            service.add("Alice\nFAKE LOG LINE: admin login succeeded\r\n", "Hello");
+        } finally {
+            logger.detachAppender(appender);
+        }
+
+        String formattedMessage = appender.list.get(0).getFormattedMessage();
+        assertThat(formattedMessage).doesNotContain("\n").doesNotContain("\r");
     }
 }

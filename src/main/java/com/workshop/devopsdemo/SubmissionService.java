@@ -31,11 +31,16 @@ public class SubmissionService {
         Submission submission = new Submission(sequence.incrementAndGet(), name, message, Instant.now());
         submissions.add(submission);
         submissionCounter.increment();
-        log.info("Submission #{} received from '{}'", submission.id(), name);
+        log.info("Submission #{} received from '{}'", submission.id(), sanitizeForLog(name));
         return submission;
     }
 
     public List<Submission> findAll() {
         return submissions.reversed();
+    }
+
+    // Strips CR/LF so user input can't forge extra log lines (log injection, CWE-117).
+    private static String sanitizeForLog(String value) {
+        return value.replaceAll("[\r\n]", "_");
     }
 }
