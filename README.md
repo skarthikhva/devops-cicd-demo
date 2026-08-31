@@ -18,6 +18,10 @@ checks for all of them and tells you what's missing. It's idempotent, so re-run 
 you change code, a chart, or a values file. `./scripts/run-pipeline.sh --help` covers the
 `--no-tests`, `--down`, and `--destroy` flags.
 
+Prefer infrastructure as code? [terraform/](terraform/) brings up the identical environment
+declaratively (`terraform plan`/`apply`/`destroy`, real state) instead of running shell
+commands in a fixed order — same underlying Helm charts and values files either way.
+
 ## App
 
 A single-page feedback form (name + message) backed by an in-memory store. Built with:
@@ -63,6 +67,7 @@ This repo is being built up stage by stage as part of a CI/CD workshop:
       [observability/README.md](observability/README.md)
 - [x] Branch protection on `main`
 - [x] One-command local bootstrap -- [scripts/run-pipeline.sh](scripts/run-pipeline.sh)
+- [x] Infrastructure as Code -- [terraform/](terraform/) (declarative alternative to the script above)
 
 ## Contributing
 
