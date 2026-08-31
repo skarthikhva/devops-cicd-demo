@@ -47,3 +47,16 @@ This repo is being built up stage by stage as part of a CI/CD workshop:
 - [x] Deploy to a local `kind` cluster
 - [x] Prometheus + Grafana + Alertmanager + Loki observability stack -- see
       [observability/README.md](observability/README.md)
+- [x] Branch protection on `main`
+
+## Contributing
+
+`main` is protected: changes go through a pull request, and `build-test-analyze`,
+`docker-build-scan-push`, and `SonarCloud Code Analysis` must all pass before merging.
+
+```bash
+git checkout -b my-change
+# ...make changes...
+git push -u origin my-change
+gh pr create
+```
