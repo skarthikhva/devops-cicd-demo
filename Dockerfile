@@ -11,10 +11,11 @@ COPY src src
 RUN ./mvnw -q clean package -DskipTests
 
 # --- Runtime stage ---
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-RUN groupadd -r -g 1001 spring && useradd -r -u 1001 -g spring spring
+RUN apk upgrade --no-cache && \
+    addgroup -g 1001 spring && adduser -D -u 1001 -G spring spring
 COPY --from=build /workspace/target/devops-demo-*.jar app.jar
 RUN chown spring:spring app.jar
 USER 1001
