@@ -38,7 +38,7 @@ public class SubmissionController {
             model.addAttribute("submissions", submissionService.findAll());
             return "index";
         }
-        log.info("New submission from " + form.getName());
+        log.info("New submission from {}", form.getName());
         submissionService.add(form.getName(), form.getMessage());
         model.addAttribute("submissionForm", new SubmissionForm());
         model.addAttribute("submissions", submissionService.findAll());
