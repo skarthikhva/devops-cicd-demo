@@ -1,0 +1,17 @@
+# Local, single-service compose file. This demo app has no database or other
+# dependency to pair it with -- it's here because docker-compose is part of the
+# Level 2 toolscape (see the workshop slides), and because it's the fastest way
+# to run the container locally without typing out `docker run` flags by hand.
+# A project with a real second service (a database, a cache, a queue) would add
+# it here as another top-level service and wire it in via `depends_on`/`environment`.
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health/liveness"]
+      interval: 15s
+      timeout: 3s
+      start_period: 20s
+      retries: 3
